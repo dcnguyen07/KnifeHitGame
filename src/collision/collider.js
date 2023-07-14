@@ -1,3 +1,4 @@
+import { EventEmitter } from "@pixi/utils";
 export const ColliderEvent = Object.freeze({
     Colliding: "collider:colliding",
     NeedRemove: "collider: needremove"
@@ -10,6 +11,7 @@ export default class Collider extends EventEmitter {
         this.y = y;
         this.id = Date.now();
     }
+    
     checkCollision(objectToCheck){
         throw new Error("Must override checkCollision");
     }
