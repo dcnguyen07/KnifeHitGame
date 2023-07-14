@@ -4,11 +4,15 @@ import { Game } from "../scene/game";
 import * as TWEEN from "@tweenjs/tween.js";
 import { Util } from "../utils/utils";
 import { GameConstant } from "../gameConstant";
+import CircleCollider from "../collision/circleCollider";
+import CollisionManager, { ColliderType, CollisionManagerEvent } from "../collision/collisionManager";
+
 
 
 export class Board extends Container {
-    constructor() {
+    constructor(collisionManager) {
       super();
+      this.collisionManager = collisionManager;
       this.boardSprite = new Sprite(Texture.from('board'));
       this.boardSprite.alpha = 1;
       this.boardSprite.anchor.set(0.5);
@@ -16,36 +20,31 @@ export class Board extends Container {
       this.countRotation = 0;
       this.numRotation = 0;
       this.rotateDirection = 1;
-      this._initCollider();
       this.randomRotationToChange();
-      this._initFilter();
       this.sortableChildren = true;
       this.zIndex = 0;
       this.addChild(this.boardSprite);
       this.currentDt = 0;
+      this.boardSprite.zIndex =2;
+      this._initCollider();
+    }
+    onCollide(other){
     }
     
     _initCollider(){
-      this.collider = new Collider();
-      this.collider.width = 200;
-      this.collider.height = 150;
-      this.collider.zIndex = 110;
+      this.collider = new CircleCollider(0, 0, this.boardSprite.width / 2);
       this.addChild(this.collider);
+      this.collider.on(CollisionManagerEvent.Colliding, this.onCollide, this)
+      this.collisionManager.add(this.collider, ColliderType.Static);
     }
   
-    _initFilter(){
-      this.boardFilter = new Filter();
-      this.boardSprite.filters = [this.boardFilter];
-    }
- 
       update(dt){
       this.currentDt += dt;
       if(this.isBroken){
         this.boardSprite.texture = null;
         this.angleRotation = 0;
       }else {
-       
-        this.boardSprite.rotation += this.angleRotation;
+        this.rotation += this.angleRotation;
         this.changeRotation();
       }
       
@@ -77,16 +76,27 @@ export class Board extends Container {
           this.angleRotation -= 1/2000;
         }
       }
-      onHit(){
-        new TWEEN.Tween({y: this.y}).to({y: this.y - 50}, GameConstant.JUMP_TIMER).yoyo(true).repeat(1).onUpdate((data)=>{
-          this.boardFilter.gamma = 1.5;
-          this.y = data.y;
-        }).onComplete(() => {
-          this.boardFilter.gamma = 1;
-        }).start(this.currentDt);
-      }
+      // onHit(){
+      //   new TWEEN.Tween({y: this.y}).to({y: this.y - 50}, GameConstant.JUMP_TIMER).yoyo(true).repeat(1).onUpdate((data)=>{
+      //     this.boardFilter.gamma = 1.5;
+      //     this.y = data.y;
+      //   }).onComplete(() => {
+      //     this.boardFilter.gamma = 1;
+      //   }).start(this.currentDt);
+      // }
       randomRotationToChange(){
         this.numRotationToChange = Util.random(2, 3);
+      }
+      addKnife(knife){
+        knife.collider.enable = false;
+        knife.rotation = -this.rotation ;
+        knife.anchor.set(0.5);
+        knife.speed = 0;
+        this.addChild(knife);
+        let pos = this.toLocal(knife.position);
+        knife.position.set(pos.x, pos.y);
+        knife.isCollided = true;
+        knife.zIndex = 1;
       }
     }
   

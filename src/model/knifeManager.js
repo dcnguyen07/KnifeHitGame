@@ -5,40 +5,46 @@ import { GameConstant } from "../gameConstant";
 import { Util } from "../utils/utils";
 
 export class KnifeManager extends Container {
-    constructor() {
+    constructor(colliderManager, board) {
         super();
+        this.board = board;
+        this.colliderManager = colliderManager;
         this.knifes = [];
         this.obsKnifes = [];
         this.numOfKnife = GameConstant.KNIFE_NUMBER - 1; 
         this.boardAngleRotation = 0;
-        // this.graphic = new Graphics();
+        this.currentKnifeIndex = 0;
         this.createKnifes(); 
+        this.getKnife();
         this.createObsKnifes();
         window.addEventListener("mousedown", (e) => this._onClicky(e));
+        // this.collider = new CircleCollider(this.x, this.y, this.radius);
+        // this.collider.on(CollisionManagerEvent.Colliding, this.onCollide, this)
     }
 
     createKnifes() { 
-        this.firstKnife();
+        
         for (let i = 0; i < this.numOfKnife; i++){
-            this.anotherKnife();
+            this.addKnife();
         }
     }
-
-    firstKnife(){
-        let knife = new Knife(Game.bundle.knife);
+    addKnife(){
+        let knife = new Knife(Game.bundle.knife, this.colliderManager, this.board);
         knife.x = GameConstant.KNIFE_X_POSITION;
         knife.y = GameConstant.KNIFE_Y_POSITION;
-        knife.isActive = true;
+        knife.visible = false;
         this.knifes.push(knife);
         this.addChild(knife);
     }
-    anotherKnife(){
-        let knife = new Knife(Game.bundle.knife);
-        knife.x = GameConstant.KNIFE_X_POSITION;
-        knife.y = GameConstant.KNIFE_Y_POSITION;
-        knife.visible = true;
-        this.knifes.push(knife);
-        this.addChild(knife);
+    getKnife(){
+        if(this.currentKnifeIndex >= this.knifes.length ){
+            console.log("On Lose");
+            this.currentKnife = null;
+            return;
+        }
+        this.currentKnife = this.knifes[this.currentKnifeIndex];
+        this.currentKnife.visible = true;
+        
     }
     createObsKnifes(avaiAngle){
         let numOfDefautObs = Math.round( Util.random(0.3));
@@ -50,8 +56,6 @@ export class KnifeManager extends Container {
         let knife = new Knife(Game.bundle.knife);
         knife.x = GameConstant.BOARD_X_POSITION;
         knife.y = GameConstant.BOARD_Y_POSITION;
-        knife.anchor.set(0.5, -0.5);
-        knife.collider.anchor.set(0.5, -0.5);
         this._setObsAng(knife, avaiAngle);
         knife.beObss();
         this.obsKnifes.push(knife);
@@ -69,11 +73,13 @@ export class KnifeManager extends Container {
         obs.angle = avaiAngle[i].angle;
         avaiAngle[i].available = false;
     }
+    
     update(dt){
         this.knifes.forEach(knife => {
             knife.update(dt);
                         
         });
+
         this.obsKnifes.forEach(obs => {
             obs.angleRotation = this.boardAngleRotation;
             obs.update(dt);
@@ -89,10 +95,12 @@ export class KnifeManager extends Container {
         })
     }
     _onClicky(e){
-        if(this.knifes[0].isActive){
-            this.knifes[0].move();
-            return true;
-        }else {return false;}
+        if(this.currentKnife ){
+            this.currentKnife.move();
+            this.currentKnifeIndex++;
+            this.getKnife();
+        }
+    
     }
     onBoardHit(){
         this.obsKnifes.forEach(obs => {
