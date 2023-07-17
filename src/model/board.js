@@ -25,14 +25,16 @@ export class Board extends Container {
       this.zIndex = 0;
       this.addChild(this.boardSprite);
       this.currentDt = 0;
-      this.boardSprite.zIndex =2;
+      this.boardSprite.zIndex = 3;
       this._initCollider();
+      // this._initFragrament();
+   
     }
     onCollide(other){
     }
     
     _initCollider(){
-      this.collider = new CircleCollider(0, 0, this.boardSprite.width / 2);
+      this.collider = new CircleCollider(0,  0, this.boardSprite.width / 2);
       this.addChild(this.collider);
       this.collider.on(CollisionManagerEvent.Colliding, this.onCollide, this)
       this.collisionManager.add(this.collider, ColliderType.Static);
@@ -76,14 +78,6 @@ export class Board extends Container {
           this.angleRotation -= 1/2000;
         }
       }
-      // onHit(){
-      //   new TWEEN.Tween({y: this.y}).to({y: this.y - 50}, GameConstant.JUMP_TIMER).yoyo(true).repeat(1).onUpdate((data)=>{
-      //     this.boardFilter.gamma = 1.5;
-      //     this.y = data.y;
-      //   }).onComplete(() => {
-      //     this.boardFilter.gamma = 1;
-      //   }).start(this.currentDt);
-      // }
       randomRotationToChange(){
         this.numRotationToChange = Util.random(2, 3);
       }
@@ -96,8 +90,53 @@ export class Board extends Container {
         let pos = this.toLocal(knife.position);
         knife.position.set(pos.x, pos.y);
         knife.isCollided = true;
-        knife.zIndex = 1;
+        knife.zIndex = 2;
+       
       }
+      _initFragment() {
+        const fragmentTextures1 = [
+          Texture.from('fragment_lg_1')
+        ];
+        this.fragments1 = new AnimatedSprite(fragmentTextures1);
+        this.fragments1.anchor.set(0.5);
+        this.fragments1.scale.set(0.7);
+        this.fragments1.rotation = -0.5;
+        this.fragments1.visible = true;
+      
+        const fragmentTextures2 = [
+          Texture.from('fragment_md_1')
+        ];
+        this.fragments2 = new AnimatedSprite(fragmentTextures2);
+        this.fragments2.anchor.set(0.5);
+        this.fragments2.scale.set(0.7);
+        this.fragments2.visible = true;
+      
+        const fragmentTextures3 = [
+          Texture.from('fragment_sm_1')
+        ];
+        this.fragments3 = new AnimatedSprite(fragmentTextures3);
+        this.fragments3.anchor.set(0.5);
+        this.fragments3.scale.set(0.8);
+        this.fragments3.visible = true;
+      }
+      
+      breakUp() {
+        this.fragments1.visible = true;
+        this.fragments1.play();
+        this.fragments1.animationSpeed = 0.12 ;
+      
+    
+        this.fragments2.visible = true;
+        this.fragments2.play();
+        this.fragments2.animationSpeed = 0.12;
+        
+    
+        this.fragments3.visible = true;
+        this.fragments3.play();
+        this.fragments3.animationSpeed = 0.12;  
+       
+      }
+    
     }
   
 
