@@ -27,21 +27,26 @@ export class Board extends Container {
       this.currentDt = 0;
       this.boardSprite.zIndex = 3;
       this._initCollider();
-      // this._initFragrament();
+      this._initFragment();
+
+      this.isBroken = false;
    
     }
-    onCollide(other){
-    }
+  
     
     _initCollider(){
       this.collider = new CircleCollider(0,  0, this.boardSprite.width / 2);
       this.addChild(this.collider);
-      this.collider.on(CollisionManagerEvent.Colliding, this.onCollide, this)
+      this.collider.on(CollisionManagerEvent.Colliding, (other)=> {
+        this.emit("collider");
+      })
       this.collisionManager.add(this.collider, ColliderType.Static);
     }
   
       update(dt){
-      this.currentDt += dt;
+      if(!this.isBroken){
+        this.currentDt += dt;
+        TWEEN.update(this.currentDt);
       if(this.isBroken){
         this.boardSprite.texture = null;
         this.angleRotation = 0;
@@ -49,6 +54,7 @@ export class Board extends Container {
         this.rotation += this.angleRotation;
         this.changeRotation();
       }
+    }
       
       }
       changeRotation(){
@@ -91,52 +97,61 @@ export class Board extends Container {
         knife.position.set(pos.x, pos.y);
         knife.isCollided = true;
         knife.zIndex = 2;
+      
        
       }
       _initFragment() {
-        const fragmentTextures1 = [
-          Texture.from('fragment_lg_1')
-        ];
-        this.fragments1 = new AnimatedSprite(fragmentTextures1);
+        this.fragments1 = new Sprite( Texture.from('fragment_lg_1'));
         this.fragments1.anchor.set(0.5);
         this.fragments1.scale.set(0.7);
         this.fragments1.rotation = -0.5;
-        this.fragments1.visible = true;
+        this.addChild(this.fragments1);
+        this.fragments1.visible = false;
       
-        const fragmentTextures2 = [
-          Texture.from('fragment_md_1')
-        ];
-        this.fragments2 = new AnimatedSprite(fragmentTextures2);
+        this.fragments2 = new Sprite(  Texture.from('fragment_md_1'));
         this.fragments2.anchor.set(0.5);
-        this.fragments2.scale.set(0.7);
-        this.fragments2.visible = true;
+        this.fragments2.scale.set(0.8);
+        this.addChild(this.fragments2);
+        this.fragments2.visible = false;
       
-        const fragmentTextures3 = [
-          Texture.from('fragment_sm_1')
-        ];
-        this.fragments3 = new AnimatedSprite(fragmentTextures3);
+        this.fragments3 = new Sprite( Texture.from('fragment_sm_1'));
         this.fragments3.anchor.set(0.5);
         this.fragments3.scale.set(0.8);
-        this.fragments3.visible = true;
+        this.addChild(this.fragments3);
+        this.fragments3.visible = false;
       }
       
       breakUp() {
+        this.boardSprite.visible = false;
         this.fragments1.visible = true;
-        this.fragments1.play();
-        this.fragments1.animationSpeed = 0.12 ;
-      
-    
         this.fragments2.visible = true;
-        this.fragments2.play();
-        this.fragments2.animationSpeed = 0.12;
-        
-    
         this.fragments3.visible = true;
-        this.fragments3.play();
-        this.fragments3.animationSpeed = 0.12;  
-       
+        this.isBroken = true;
+        new TWEEN.Tween(this.fragments1).to({x: 200, y: -2,rotation: this.fragments1.rotation + 3},25)
+        .onComplete(() => {
+          new TWEEN.Tween(this.fragments1)
+          .to({ x: 280, y: 1500, rotation:this.fragments1.rotation + 4 },50)
+          .start(this.currentDt);
+        })
+        .start(this.currentDt);
+        
+       new TWEEN.Tween(this.fragments2).to({x: 150, y: -300, rotation: this.fragments2.rotation + 3}, 25)
+       .onComplete(() => {
+         new TWEEN.Tween(this.fragments2).to({x: 300, y:1250, rotation: this.fragments2.rotation + 3}, 50)
+         .start(this.currentDt);
+        })
+        .start(this.currentDt);
+        
+        new TWEEN.Tween(this.fragments3).to({x: -150, y: 300, rotation: this.fragments3.rotation + 3}, 25)
+        .onComplete(() => {
+          new TWEEN.Tween(this.fragments3).to({x: 300, y:1250, rotation: this.fragments3.rotation + 3}, 50)
+          .start(this.currentDt);
+        })
+        .start(this.currentDt);
+        
+      
       }
-    
+      
     }
   
 
