@@ -6,6 +6,8 @@ import * as TWEEN from "@tweenjs/tween.js";
 import { ColliderType, CollisionManagerEvent } from "../collision/collisionManager";
 import { KnifeManager } from "./knifeManager";
 import { Board } from "./board";
+import RectCollider from "../collision/rectCollider";
+import CircleCollider from "../collision/circleCollider";
 export const KnifeState = Object.freeze({
     DEFAULT: "default",
     ACTIVATED: "activated",
@@ -29,33 +31,30 @@ export class Knife extends Sprite {
         this.currentTime = 0;
         this.isCollided = false;
         this._initCollider();
+        this._initColliderStatic();
     }
     _initCollider() {
         this.collider = new Collider();
         this.collider.height = 150;
         this.addChild(this.collider);
-        this.collider.on(CollisionManagerEvent.Colliding, (other)=>{
-            if(other){
-            console.log(123);
-            };
-            if(this.knifeOnBoard){
-                this.colliderManager.add(this.collider, ColliderType.Static);
-            }else{
-                this.colliderManager.add(this.collider, ColliderType.Dynamic);
-            }
-        })
-
         this.collider.on(CollisionManagerEvent.Colliding, (other)=> {
-          if (other.parent instanceof Board){
-            this.addKnifeToBoard();
-          }
+            if (other.parent instanceof Board){
+                this.addKnifeToBoard();
+            }
         });
-        if(this.onBoard){
-            this.colliderManager.add(this.collider, ColliderType.Static);
-             
-        } else {
-            this.colliderManager.add(this.collider, ColliderType.Dynamic);
-        }
+        this.colliderManager.add(this.collider, ColliderType.Dynamic);
+    }
+    _initColliderStatic(){
+        this.colliderStatic = new Collider();
+        this.colliderStatic.height = 150;
+        this.addChild(this.colliderStatic);
+        this.colliderManager.add(this.colliderStatic, ColliderType.Static);
+        this.colliderStatic.enable = false;
+        this.colliderStatic.on(CollisionManagerEvent.Colliding, (other)=> {
+            if(other.parent instanceof Knife){
+                console.log("thua");
+            }
+        });
     }
     
     addKnifeToBoard() {
@@ -64,6 +63,8 @@ export class Knife extends Sprite {
           this.parent.removeChild(this);
         }
         this.board.addKnife(this);
+        this.collider.enable = false;
+        this.colliderStatic.enable = true;
     }
     move() {
         this.state = KnifeState.MOVE;

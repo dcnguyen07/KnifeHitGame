@@ -45,14 +45,14 @@ export class KnifeManager extends Container {
             return ;
            }
         this.currentKnife = this.knifes[this.currentKnifeIndex];
-        this.currentKnife.visible = true;
-        this.currentKnife.collider.enable = true;
+       
        
     }
     update(dt){
         this.knifes.forEach(knife => {
             knife.update(dt);            
         });
+        
     }
     _onClicky(e){
         if(this.currentKnife ){

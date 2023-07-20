@@ -28,6 +28,7 @@ export const GameConstant = Object.freeze({
     hitText_width : 370,
     hitText_height : 200,
     JUMP_TIMER: 1,
+    JUMP_DISTANCE: 5,
     DEBUG_DRAW_COLLIDER: false,
     CIRCLE_COLLIDER : 'circle',
     RECT_COLLIDER : 'rect', 

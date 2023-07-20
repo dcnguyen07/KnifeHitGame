@@ -3,17 +3,14 @@ import { GameConstant } from "../../gameConstant";
 
 export class Collider extends Sprite {
     constructor(){
-        super();
+        super(Texture.WHITE);
         this.width = 40;
         this.height = 350;
         this.anchor.set(0.5);
-        this.texture = Texture.WHITE;
-        this.visible = false;
-        if(GameConstant.DEBUG_DRAW_COLLIDER){
-            this.visible = true;
-            this.texture = Texture.WHITE;
-        }
+        this.visible = GameConstant.DEBUG_DRAW_COLLIDER;
+        this.enable = true;
     }
+    
     getPosition(){
         if (this._tmpPos) {
             this.getGlobalPosition(this._tmpPos, true);

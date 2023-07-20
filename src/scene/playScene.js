@@ -81,9 +81,9 @@ export const GameState = Object.freeze({
       this.knifeManager.x = 0;
       this.knifeManager.y = 0;
       this.gameplay.addChild(this.knifeManager);
-      this.knifeManager.on("Win" , ()=>{
-      this.board.breakUp();
-      this.boardBroken.play(); 
+      this.board.on("knife" , ()=>{
+        this.board.breakUp();
+        this.boardBroken.play(); 
       });
       this.knifeManager.zIndex = 0;
       
@@ -106,11 +106,7 @@ export const GameState = Object.freeze({
         this.appleManager.x = GameConstant.BOARD_X_POSITION + (this.board.width / 2) - (this.appleManager.width / 2) ;
         this.appleManager.y = GameConstant.BOARD_Y_POSITION + (this.board.height / 2) - (this.appleManager.height / 2) ;
         this.gameplay.addChild(this.appleManager);
-        this.appleManager.on("apple", ()=> {
-            // this.knifeManager.removeApple();
-            this.knifeHitApple.play();
-        });
-        this.appleManager.zIndex = 100;
+        this.appleManager.zIndex = 101;
       
     
     }
@@ -125,11 +121,8 @@ export const GameState = Object.freeze({
       this.knifex2 = Sound.from(soundknife);
       let soundboard = Assets.get("knife_hit_wood");
       this.knifehitboard = Sound.from(soundboard);
-      let soundapple = Assets.get("knife_hit_apple")
-      this.knifeHitApple = Sound.from(soundapple);
       let sound = Assets.get("brokenBoard");
       this.boardBroken = Sound.from(sound);
-    
     }
     update(dt){
       this.currentDt += dt;
@@ -139,6 +132,4 @@ export const GameState = Object.freeze({
       this.appleManager.update(dt);
       this.board.update(dt);
     }
-
-
 }

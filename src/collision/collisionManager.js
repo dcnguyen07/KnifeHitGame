@@ -1,5 +1,6 @@
 import { EventEmitter } from "@pixi/utils";
 import CircleCollider from "./circleCollider";
+import { Collider } from "../model/physics/collider";
 
 export const CollisionManagerEvent = Object.freeze({
   Colliding: "collisionmanager:colliding",
@@ -37,26 +38,28 @@ export default class CollisionManager extends EventEmitter {
   }
 
   update() {
-  
-     this.listColliders.static.forEach((staticCollider) => {
-      if(!staticCollider.enable){
+    this.listColliders.static.forEach((staticCollider) => {
+      if (!staticCollider.enable) {
         return;
       }
       this.listColliders.dynamic.forEach((dynamicCollider) => {
-        if(!dynamicCollider.enable){
+        if (!dynamicCollider.enable) {
           return;
         }
         if (staticCollider instanceof CircleCollider) {
           const isCollideCircle = this.isCollideCircle(staticCollider, dynamicCollider);
-          if(isCollideCircle){
+          if (isCollideCircle) {
             staticCollider.emit(CollisionManagerEvent.Colliding, dynamicCollider);
             dynamicCollider.emit(CollisionManagerEvent.Colliding, staticCollider);
           }
-          else {
-            // const isCollideRect = this.isCollideRect(staticCollider, dynamicCollider);
-            // this.emit(CollisionManagerEvent.Colliding, isCollideRect);
+        }
+        if (staticCollider instanceof Collider) {
+          const isCollideRect = this.isCollideRect(staticCollider, dynamicCollider);
+          if (isCollideRect) {
+            staticCollider.emit(CollisionManagerEvent.Colliding, dynamicCollider);
+            dynamicCollider.emit(CollisionManagerEvent.Colliding, staticCollider);
           }
-    }
+        }
       });
     });
   }
@@ -69,7 +72,7 @@ export default class CollisionManager extends EventEmitter {
     const closestPointX = Math.max(rectBound.x, Math.min(circleBound.x, rectBound.x + rectBound.width));
     const closestPointY = Math.max(rectBound.y, Math.min(circleBound.y, rectBound.y + rectBound.height));
 
-    const distance = Math.sqrt((rectBound.x - closestPointX) ** 2 + (circleBound.y - closestPointY) ** 2);
+    const distance = Math.sqrt((circleBound.x - closestPointX) ** 2 + (circleBound.y - closestPointY) ** 2);
     if (distance <= radius) {
       return true;
     } else {

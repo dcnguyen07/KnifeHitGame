@@ -29,15 +29,7 @@ export class ResultGameUI extends Container {
         this.box.height = 400;
         this.box.opacity = 0.6;
         this.addChild(this.box);
-        // const gifTexture = Texture.from('../assets/images/victory.gif');
-        // this.box = new AnimatedSprite([gifTexture]);
-        // // Thiết lập vị trí và kích thước của this.box
-        // this.box.width = 400;
-        // this.box.height =400;
-        // // Thêm this.box vào stage
-        // this.addChild(this.box);
-        // // Bắt đầu phát lại hình ảnh chuyển động
-        // this.box.play();
+        
         }
      _initMessage() {
        
