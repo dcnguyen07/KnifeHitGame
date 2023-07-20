@@ -5,6 +5,7 @@ import { Collider } from "./physics/collider";
 import * as TWEEN from "@tweenjs/tween.js";
 import { ColliderType, CollisionManagerEvent } from "../collision/collisionManager";
 import { KnifeManager } from "./knifeManager";
+import { Board } from "./board";
 export const KnifeState = Object.freeze({
     DEFAULT: "default",
     ACTIVATED: "activated",
@@ -33,81 +34,41 @@ export class Knife extends Sprite {
         this.collider = new Collider();
         this.collider.height = 150;
         this.addChild(this.collider);
+        this.collider.on(CollisionManagerEvent.Colliding, (other)=>{
+            if(other){
+            console.log(123);
+            };
+            if(this.knifeOnBoard){
+                this.colliderManager.add(this.collider, ColliderType.Static);
+            }else{
+                this.colliderManager.add(this.collider, ColliderType.Dynamic);
+            }
+        })
+
         this.collider.on(CollisionManagerEvent.Colliding, (other)=> {
-          if (other){
+          if (other.parent instanceof Board){
             this.addKnifeToBoard();
           }
-       
         });
         if(this.onBoard){
             this.colliderManager.add(this.collider, ColliderType.Static);
-
+             
         } else {
             this.colliderManager.add(this.collider, ColliderType.Dynamic);
-
         }
-     }
-     addKnifeToBoard() {
+    }
+    
+    addKnifeToBoard() {
         this.speed = 0;
-        this.parent.removeChild(this);
+        if (this.parent) {
+          this.parent.removeChild(this);
+        }
         this.board.addKnife(this);
     }
-  
-
     move() {
         this.state = KnifeState.MOVE;
         this.speed = 70;
     }
-
-    // _toActive() {
-    //     this.state= KnifeState.ACTIVATING;
-    //     new TWEEN.Tween(this).to({y: GameConstant.KNIFE_Y_POSITION}, 1).onComplete(() => {
-    //         this.state = KnifeState.ACTIVATED;
-    //     }).start(this.currentTime);
-    // }
-    // setActivate() {
-    //     this.visible = true;
-    //     this.state = KnifeState.ACTIVE;
-    // }
-
-    // setFall() {
-    //     this.state = KnifeState.FALL;
-    // }
-
-    // setAnotherObsFall() {
-    //     this.setFall();
-    //     if ((this.angle%360) <= 180) {
-    //         if((this.angle%360) >= 90) {
-    //             this.isFallUpLeft = true;
-    //         } else {
-    //             this.isFallDownLeft = true;
-    //         }
-    //     } else {
-    //         if((this.angle%360) <= 270) {
-    //             this.isFallUpRight = true;
-    //         } else {
-    //             this.isFallDownRight = true;
-    //         }
-    //     }
-    //     this.fallRotation = Util.random(0.1, 0.3);
-    //     this.fallX = Util.random(8,15);
-    //     this.fallY = Util.random(15,20);
-    //     this.pushForce = 50;
-    // }
-
-    // setLastObsFall() {
-    //     this.setFall();
-    //     this.isLastOne = true;
-    //     this.fallRotation = Util.random(0.05, 0.1);
-    //     this.fallX = Util.random(-5,5);
-    //     this.fallY = Util.random(15,20);
-    //     this.pushForce = 50;
-    // }
-
-    // beObs() {
-    //     this.state = KnifeState.OBSTACLE;
-    // }
-
     update(dt) {
         if(this.isCollided) {
             return;
@@ -129,9 +90,5 @@ export class Knife extends Sprite {
         }
 
     }
-   
-    // moveUpABit() {
-    //     new TWEEN.Tween(this).to({y: this.y - 10}, GameConstant.JUMP_TIMER).yoyo(true).repeat(1).start(this.currentTime);
-    //   }
+  
 }
-//  this.addNewKnife();

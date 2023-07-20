@@ -6,6 +6,7 @@ import { Util } from "../utils/utils";
 import { GameConstant } from "../gameConstant";
 import CircleCollider from "../collision/circleCollider";
 import CollisionManager, { ColliderType, CollisionManagerEvent } from "../collision/collisionManager";
+import { Knife } from "./knife";
 
 
 
@@ -22,15 +23,15 @@ export class Board extends Container {
       this.rotateDirection = 1;
       this.randomRotationToChange();
       this.sortableChildren = true;
-      this.zIndex = 0;
+      this.zIndex = 5;
       this.addChild(this.boardSprite);
       this.currentDt = 0;
-      this.boardSprite.zIndex = 3;
+      this.boardSprite.zIndex = 5;
       this._initCollider();
       this._initFragment();
-
       this.isBroken = false;
-   
+      this.knifeTarget = 6; 
+      this.knifeCount = 0;
     }
   
     
@@ -39,6 +40,7 @@ export class Board extends Container {
       this.addChild(this.collider);
       this.collider.on(CollisionManagerEvent.Colliding, (other)=> {
         this.emit("collider");
+        
       })
       this.collisionManager.add(this.collider, ColliderType.Static);
     }
@@ -84,9 +86,18 @@ export class Board extends Container {
           this.angleRotation -= 1/2000;
         }
       }
+
       randomRotationToChange(){
         this.numRotationToChange = Util.random(2, 3);
       }
+
+      removeAllKnife(){
+        let knifes = this.children.filter(child => child instanceof Knife);
+        this.removeChild(...knifes);
+
+        }
+      
+
       addKnife(knife){
         knife.collider.enable = false;
         knife.rotation = -this.rotation ;
@@ -96,29 +107,33 @@ export class Board extends Container {
         let pos = this.toLocal(knife.position);
         knife.position.set(pos.x, pos.y);
         knife.isCollided = true;
-        knife.zIndex = 2;
-      
-       
+        knife.zIndex = 4;
+        this.knifeCount++;
+          if (this.knifeCount === this.knifeTarget) {
+            this.removeAllKnife();
+            this.emit("knife"); 
+          }
       }
       _initFragment() {
-        this.fragments1 = new Sprite( Texture.from('fragment_lg_1'));
+        this.fragments1 = new Sprite(Texture.from('fragment_lg_1'));
         this.fragments1.anchor.set(0.5);
         this.fragments1.scale.set(0.7);
         this.fragments1.rotation = -0.5;
         this.addChild(this.fragments1);
         this.fragments1.visible = false;
       
-        this.fragments2 = new Sprite(  Texture.from('fragment_md_1'));
+        this.fragments2 = new Sprite(Texture.from('fragment_md_1'));
         this.fragments2.anchor.set(0.5);
         this.fragments2.scale.set(0.8);
         this.addChild(this.fragments2);
         this.fragments2.visible = false;
       
-        this.fragments3 = new Sprite( Texture.from('fragment_sm_1'));
+        this.fragments3 = new Sprite(Texture.from('fragment_sm_1'));
         this.fragments3.anchor.set(0.5);
         this.fragments3.scale.set(0.8);
         this.addChild(this.fragments3);
         this.fragments3.visible = false;
+
       }
       
       breakUp() {
@@ -148,8 +163,6 @@ export class Board extends Container {
           .start(this.currentDt);
         })
         .start(this.currentDt);
-        
-      
       }
       
     }
