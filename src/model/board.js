@@ -23,7 +23,7 @@ export class Board extends Container {
       this.rotateDirection = 1;
       this.randomRotationToChange();
       this.sortableChildren = true;
-      this.zIndex = 5;
+      this.zIndex = 4;
       this.addChild(this.boardSprite);
       this.currentDt = 0;
       this.boardSprite.zIndex = 5;
@@ -32,6 +32,7 @@ export class Board extends Container {
       this.isBroken = false;
       this.knifeTarget = 6; 
       this.knifeCount = 0;
+      this._initFilter();
     }
   
     
@@ -40,11 +41,16 @@ export class Board extends Container {
       this.addChild(this.collider);
       this.collider.on(CollisionManagerEvent.Colliding, (other)=> {
         this.emit("collider");
-        
+        this.onHit();
       })
       this.collisionManager.add(this.collider, ColliderType.Static);
+      this.collider.zIndex = 110;
     }
-  
+    onHit() {
+      new TWEEN.Tween(this).to({y: this.y - GameConstant.JUMP_DISTANCE}, GameConstant.JUMP_TIMER).yoyo(true).repeat(1).onUpdate(() => {
+      }).onComplete(() => {
+      }).start(this.currentDt);
+    }
       update(dt){
       if(!this.isBroken){
         this.currentDt += dt;
@@ -58,6 +64,10 @@ export class Board extends Container {
       }
     }
       
+      }
+      _initFilter() {
+        this.boardFilter = new Filter();
+        this.boardSprite.filters = [this.boardFilter];
       }
       changeRotation(){
         this.countRotation += Math.abs(this.angleRotation);
@@ -93,11 +103,13 @@ export class Board extends Container {
 
       removeAllKnife(){
         let knifes = this.children.filter(child => child instanceof Knife);
-        this.removeChild(...knifes);
-
+        knifes.forEach(knife => { 
+         new  TWEEN.Tween(knife).to( { y: this.y + GameConstant.JUMP_DISTANCE, onComplete: () => {
+        }});
+      });
+      this.removeChild(...knifes);
         }
-      
-
+     
       addKnife(knife){
         knife.collider.enable = false;
         knife.rotation = -this.rotation ;
@@ -107,13 +119,14 @@ export class Board extends Container {
         let pos = this.toLocal(knife.position);
         knife.position.set(pos.x, pos.y);
         knife.isCollided = true;
-        knife.zIndex = 4;
+        knife.zIndex = 3;
         this.knifeCount++;
           if (this.knifeCount === this.knifeTarget) {
             this.removeAllKnife();
             this.emit("knife"); 
           }
-      }
+        }
+      
       _initFragment() {
         this.fragments1 = new Sprite(Texture.from('fragment_lg_1'));
         this.fragments1.anchor.set(0.5);
@@ -135,7 +148,6 @@ export class Board extends Container {
         this.fragments3.visible = false;
 
       }
-      
       breakUp() {
         this.boardSprite.visible = false;
         this.fragments1.visible = true;
@@ -164,7 +176,7 @@ export class Board extends Container {
         })
         .start(this.currentDt);
       }
-      
+    
     }
   
-
+    

@@ -39,5 +39,5 @@ export class Apple extends Sprite {
     }
     this.currentTime += dt;
   }
-  
+ 
   }

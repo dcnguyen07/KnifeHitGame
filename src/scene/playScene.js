@@ -17,7 +17,7 @@ export const GameState = Object.freeze({
     Lose: "lose",
   });
   export const Level1 = Object.freeze({
-    KNIFE_NUMBER: 7,
+    KNIFE_NUMBER:3,
   });
   export class PlayScene extends Container {
     constructor() {
@@ -26,7 +26,7 @@ export const GameState = Object.freeze({
       this.score = 0;
       this.appleScore = 0;
   
-      this._initGamePlay();
+    this._initGamePlay();
       this.currentDt = 0;
    
     }
@@ -69,9 +69,11 @@ export const GameState = Object.freeze({
       this.board = new Board(this.collideManager);
       this.board.x = GameConstant.BOARD_X_POSITION;
       this.board.y = GameConstant.BOARD_Y_POSITION;
+    
       this.gameplay.addChild(this.board);
       this.board.on("collider", ()=>{
         this.knifehitboard.play();
+  
       });
       this.board.zIndex = 100;
     }
@@ -84,6 +86,7 @@ export const GameState = Object.freeze({
       this.board.on("knife" , ()=>{
         this.board.breakUp();
         this.boardBroken.play(); 
+      
       });
       this.knifeManager.zIndex = 0;
       
@@ -110,15 +113,7 @@ export const GameState = Object.freeze({
       
     
     }
-    _initVictory(){
-      this.victory = new Sprite(Texture.from("victory"));
-      this.victory.width = GameConstant.GAME_WIDTH;
-      this.victory.height = GameConstant.GAME_HEIGHT;
-      this.gameplay.addChild(this.victory);
-    }
     _initSound() {
-      let soundknife = Assets.get("knife_hit_knife");
-      this.knifex2 = Sound.from(soundknife);
       let soundboard = Assets.get("knife_hit_wood");
       this.knifehitboard = Sound.from(soundboard);
       let sound = Assets.get("brokenBoard");

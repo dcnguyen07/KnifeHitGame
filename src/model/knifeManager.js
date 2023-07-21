@@ -18,15 +18,14 @@ export class KnifeManager extends Container {
         this.numOfKnife = GameConstant.KNIFE_NUMBER - 1; 
         this.boardAngleRotation = 0;
         this.currentKnifeIndex = 0;
-        this.createKnifes(); 
-        this.getKnife();  
+        this.currentDt = 0;
+        this.createKnifes();
         window.addEventListener("mousedown", (e) => this._onClicky(e));
     }
     
     createKnifes() { 
         for (let i = 0; i < this.numOfKnife; i++){
             this.addKnife();
-         
         }
     }
     
@@ -39,13 +38,10 @@ export class KnifeManager extends Container {
     }
     
     getKnife() {
-        if (this.currentKnifeIndex  >= this.knifes.length ) {
-            if (this.currentKnife) {
-            }
-            return ;
-           }
-        this.currentKnife = this.knifes[this.currentKnifeIndex];
-       
+        if (this.currentKnifeIndex >= this.knifes.length ) {
+            return;
+        }
+        return this.knifes[this.currentKnifeIndex];
        
     }
     update(dt){
@@ -55,11 +51,11 @@ export class KnifeManager extends Container {
         
     }
     _onClicky(e){
-        if(this.currentKnife ){
-            this.currentKnife.move();
+        let knife = this.getKnife();
+        if(knife){
             this.currentKnifeIndex++;
-            this.getKnife();
+            knife.move();
         }
     }
-    
+   
 }
