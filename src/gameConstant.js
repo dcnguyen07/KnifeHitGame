@@ -1,11 +1,11 @@
 export const GameConstant = Object.freeze({
-    GAME_WIDTH: 720,
+    GAME_WIDTH: 900,
     GAME_HEIGHT: 1280,
 
-    KNIFE_X_POSITION: 360,
+    KNIFE_X_POSITION: 450,
     KNIFE_Y_POSITION: 950,  
 
-    BOARD_X_POSITION: 360,
+    BOARD_X_POSITION: 450,
     BOARD_Y_POSITION: 386,
 
     knife_x : 40,
@@ -28,7 +28,7 @@ export const GameConstant = Object.freeze({
     hitText_width : 370,
     hitText_height : 200,
     JUMP_TIMER: 1,
-    JUMP_DISTANCE: 5,
+    JUMP_DISTANCE: 10,
     DEBUG_DRAW_COLLIDER: false,
     CIRCLE_COLLIDER : 'circle',
     RECT_COLLIDER : 'rect', 

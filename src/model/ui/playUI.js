@@ -1,35 +1,29 @@
-import { Container, TextStyle } from "pixi.js";
-import { Game } from "../../scene/Game";
+import { Container, Sprite, Text, TextStyle } from "pixi.js";
+import { Game } from "../../game";
 import { GameConstant } from "../../gameConstant";
-import { Level1 } from "../../scene/playScene";
+import { Level1 } from "../scenes/playScene";
 
-export class PlayUI extends Container{
-    constructor(score, appleScore){
+export class PlayUI extends Container {
+    constructor(data, score, appleScore) {
         super();
+        this.levelData = data;
         this.playTime = 0;
         this.score = score;
         this.appleScore = appleScore;
-        this._initTimer();
+        this._initLevel();
         this._initScore();
         this._initAppleCount();
         this._initKnifeCount();
         this.resize();
     }
 
-    _initTimer() {
+    _initLevel() {
         let textStyle = new TextStyle({ fontSize: 45, align: "center", fill: 0xe6b85f, fontWeight: "bold", fontFamily: "Comic Sans MS" });
-        this.timerText = new Text(`${this._formatTime(0)}`, textStyle);
-        this.timerText.anchor.set(0.5, 0);
-        this.addChild(this.timerText);
+        this.levelText = new Text(`Level ${this.levelData.currentLevel}`, textStyle);
+        this.levelText.anchor.set(0.5, 0);
+        this.addChild(this.levelText);
     }
 
-    _formatTime(totalSeconds) {
-        var minutes = Math.floor(totalSeconds / 60);
-        var seconds = Math.floor(totalSeconds % 60);
-        var milliseconds = Math.floor((totalSeconds % 1) * 100);
-        return (minutes < 10 ? "" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-    }
-    
     _initScore() {
         let textStyle = new TextStyle({ fontSize: 45, align: "center", fill: 0xe6b85f, fontWeight: "bold", fontFamily: "Comic Sans MS" });
         this.scoreText = new Text(`${this.score}`, textStyle);
@@ -58,7 +52,7 @@ export class PlayUI extends Container{
         this.knifeIconsContainer = new Container();
         this.addChild(this.knifeIconsContainer);
 
-        for (let i = 0; i < Level1.KNIFE_NUMBER; i++) {
+        for (let i = 0; i < this.levelData.numOfKnife(); i++) {
             let knife = Sprite.from(Game.bundle.knife_white_icon);
             knife.y = i * 45;
             this.knifeIcons.push(knife);
@@ -78,11 +72,6 @@ export class PlayUI extends Container{
         this.knifeIcons.at(index).texture = Game.bundle.knife_black_icon;
     }
     
-    updateTime(dt) {
-        this.playTime += dt;
-        this.timerText.text = `${this._formatTime(this.playTime)}`;
-    }
-    
     hide() {
         this.visible = false;
     }
@@ -92,8 +81,8 @@ export class PlayUI extends Container{
     }
 
     resize() {
-        this.timerText.x = GameConstant.GAME_WIDTH/2;
-        this.timerText.y = 10;
+        this.levelText.x = GameConstant.GAME_WIDTH/2;
+        this.levelText.y = 10;
         this.scoreText.x = 50;
         this.scoreText.y = 10;
         this.appleScoreContainer.x = GameConstant.GAME_WIDTH - 70;

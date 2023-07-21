@@ -65,6 +65,9 @@ export default class CollisionManager extends EventEmitter {
   }
 
   isCollideCircle(circleCollide, rectCollide) {
+    if(!circleCollide.enable || !rectCollide.enable){
+      return false;
+    }
     let circleBound = circleCollide.getBounds();
     let radius = circleCollide.radius;
     let rectBound = rectCollide.getBounds();
