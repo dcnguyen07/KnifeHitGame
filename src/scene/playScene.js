@@ -9,6 +9,8 @@ import * as TWEEN from "@tweenjs/tween.js";
 import { Util } from "../utils/utils";
 import CollisionManager from "../collision/collisionManager";
 import { Sound } from "@pixi/sound";
+import { PlayUI } from "../model/ui/playUI";
+import { ResultGameUI } from "../model/ui/resultGameUI";
 
 export const GameState = Object.freeze({
     Tutorial: "tutorial",
@@ -25,12 +27,12 @@ export const GameState = Object.freeze({
       this.state = GameState.Tutorial;
       this.score = 0;
       this.appleScore = 0;
-  
-    this._initGamePlay();
+      this.currentLevel = 1;
+      this._initGamePlay();
       this.currentDt = 0;
-   
+      
     }
-  
+    
     _initGamePlay() {
       this.gameplay = new Container();
       this.gameplay.eventMode = "static";
@@ -43,7 +45,9 @@ export const GameState = Object.freeze({
       this._initKnifeManager();
       this._initObstacle();
       this._initSound();
-    
+      this._initUI();
+      
+      
     }
 
     _initCollisionManager(){
@@ -73,7 +77,7 @@ export const GameState = Object.freeze({
       this.gameplay.addChild(this.board);
       this.board.on("collider", ()=>{
         this.knifehitboard.play();
-  
+        this.playUI.updateScore(++this.score);
       });
       this.board.zIndex = 100;
     }
@@ -88,6 +92,9 @@ export const GameState = Object.freeze({
         this.boardBroken.play(); 
       
       });
+      this.knifeManager.on("click", ()=>{
+        // this.playUI.updateKnifeIcon();
+      })
       this.knifeManager.zIndex = 0;
       
     }
@@ -110,8 +117,17 @@ export const GameState = Object.freeze({
         this.appleManager.y = GameConstant.BOARD_Y_POSITION + (this.board.height / 2) - (this.appleManager.height / 2) ;
         this.gameplay.addChild(this.appleManager);
         this.appleManager.zIndex = 101;
-      
-    
+        this.appleManager.on("score", ()=> {
+          this.playUI.updateAppleScore(++this.appleScore);
+        });
+    }
+    _initUI(){
+      this.playUI = new PlayUI(this.score, this.appleScore);
+      this.addChild(this.playUI);
+      this.resultUI = new ResultGameUI();
+      this.addChild(this.resultUI);
+      this.resultUI.hide();
+      this.resultUI.on("tapped", (e)=> this._onContOrRestart(e));
     }
     _initSound() {
       let soundboard = Assets.get("knife_hit_wood");
@@ -127,4 +143,33 @@ export const GameState = Object.freeze({
       this.appleManager.update(dt);
       this.board.update(dt);
     }
-}
+    _onContOrRestart() {
+      if (this.resultUI.messageText.text === "You lose" ) {
+        this._onRestartGame();
+      } else {
+        this._onContGame();
+      }
+    }
+    _onContGame() {
+      this.winGame.stop();
+     this.removeChild(this.gameplay);
+     this.gameplay.destroy();
+     this.removeChild(this.playUI, this.resultUI);
+     this.playUI.destroy();
+     this.resultUI.destroy();
+     this._initGamePlay();
+     this._initUI();
+    }
+   _onRestartGame() {
+     this.currentLevel = 1;
+     this.loseGame.stop();
+     this.removeChild(this.gameplay);
+     this.gameplay.destroy();
+     this.score = 0; 
+     this._initGamePlay();
+     this.removeChild(this.playUI, this.resultUI);
+     this.playUI.destroy();
+     this.resultUI.destroy();
+     this._initUI();
+   }
+  }
