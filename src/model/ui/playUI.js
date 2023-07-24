@@ -1,4 +1,4 @@
-import { Container, Sprite, Text, TextStyle } from "pixi.js";
+import { Container, Sprite, Text, TextStyle, Texture } from "pixi.js";
 import { Game } from "../../scene/game";
 import { GameConstant } from "../../gameConstant";
 
@@ -47,7 +47,7 @@ export class PlayUI extends Container {
     this.addChild(this.knifeIconsContainer);
 
     for (let i= 0; i < this.levelData.numOfKnife; i++){
-        let knife = Sprite.from(Game.bundle.knifewhite);
+        let knife = new Sprite(Texture.from("knifewhite"));
         knife.y = i * 45;
         this.knifeIcons.push(knife);
         this.knifeIconsContainer.addChild(knife);
@@ -80,7 +80,7 @@ export class PlayUI extends Container {
     this.appleText.text = `${apple}`;
 }
    updateKnifeIcon(index){
-    this.knifeIcons[index].texture = Game.bundle.knifeblack;
+    this.knifeIcons[index] = new Sprite (Texture.from('knifeblack'));
    }
    hide(){
     this.visible = false;
@@ -96,6 +96,6 @@ export class PlayUI extends Container {
     this.appleScoreContainer.x = GameConstant.GAME_WIDTH - 100;
     this.appleScoreContainer.y = 10;
     this.knifeIconsContainer.x = 30;
-    this.knifeIconsContainer.y = 1150 - this.knifeIconsContainer.height;
+    this.knifeIconsContainer.y = 1000 - this.knifeIconsContainer.height;
    }
 }

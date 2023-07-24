@@ -30,6 +30,7 @@ export class AppleManager extends Container{
         apple.collider.anchor.set(0.5, -3);
         apple.collider.on(CollisionManagerEvent.Colliding, (other)=> {
             this.appleContainer.removeChild(apple);
+           this.emit("score");
             let index = this.apples.indexOf(apple);
             if(index >= 0){
                 this.apples.splice(index, 1);

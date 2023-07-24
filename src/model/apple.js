@@ -27,6 +27,7 @@ export class Apple extends Sprite {
     if(other){
       this.knifeHitApple.play();
       this.emit("apple");
+     
     }
     });
   }

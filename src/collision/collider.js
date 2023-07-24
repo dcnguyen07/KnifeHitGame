@@ -16,3 +16,4 @@ export default class Collider extends EventEmitter {
         throw new Error("Must override checkCollision");
     }
 }
+

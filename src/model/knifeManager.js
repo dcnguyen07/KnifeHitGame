@@ -51,6 +51,7 @@ export class KnifeManager extends Container {
         
     }
     _onClicky(e){
+        this.emit("click");
         let knife = this.getKnife();
         if(knife){
             this.currentKnifeIndex++;
